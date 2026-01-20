@@ -204,6 +204,15 @@ public:
         std::swap(_comp, other._comp);
     }
     /**
+     * @brief Swap content of two BinaryHeaps
+     * 
+     * @param lhs first BinaryHeap
+     * @param rhs second BinaryHeap
+     */
+    friend constexpr void swap(BinaryHeap& lhs, BinaryHeap& rhs) noexcept(std::is_nothrow_swappable_v<Container> && std::is_nothrow_swappable_v<Compare>) {
+        lhs.swap(rhs);
+    }
+    /**
      * @brief Reserve capacity for underlying container
      * 
      * @param cap capacity to be reserved
@@ -298,14 +307,3 @@ private:
 };
 
 }; // namespace dsa
-
-/**
- * @brief BinaryHeap specialization for std::swap
- * 
- * @param lhs first heap to be swapped
- * @param rhs second heap to be swapped
- */
-template<class T, class Container, class Compare>
-constexpr void swap(dsa::BinaryHeap<T, Container, Compare>& lhs, dsa::BinaryHeap<T, Container, Compare>& rhs) noexcept(noexcept(lhs.swap(rhs))) {
-    lhs.swap(rhs);
-}

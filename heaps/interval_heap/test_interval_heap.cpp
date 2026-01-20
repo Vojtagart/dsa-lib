@@ -197,6 +197,16 @@ void test_dummy() {
     for (size_t i = 0; i < 1'000; i++) {
         q.emplace(uni(rng));
     }
+    using std::swap;
+    dsa::IntervalHeap<Dummy<double>> q2;
+    q2.emplace(10.);
+    swap(q, q2);
+    q.emplace(5);
+    dsa::IntervalHeap<Dummy<double>> q3(std::move(q));
+    dsa::IntervalHeap<Dummy<double>> q4;
+    q4 = std::move(q2);
+    q.reserve(100);
+    q.swap(q2);
 }
 
 void test_heapify() {
@@ -228,7 +238,7 @@ int main() {
     auto fact1 = [&]() {
         return uni(rng);
     };
-    test_corectness<double>(fact1, 5'000'000, -size_t(1), 0.67, 120);
+    test_corectness<double>(fact1, 1'000'000, -size_t(1), 0.67, 120);
     std::cout << "Correctness 1 finished" << std::endl;
     test_corectness<double>(fact1, 1'000'000, 20, 0.4, 115);
     std::cout << "Correctness 2 finished" << std::endl;

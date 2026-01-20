@@ -235,6 +235,15 @@ public:
         std::swap(_comp, other._comp);
     }
     /**
+     * @brief Swap content of two IntervalHeaps
+     * 
+     * @param lhs first IntervalHeap
+     * @param rhs second IntervalHeap
+     */
+    friend constexpr void swap(IntervalHeap& lhs, IntervalHeap& rhs) noexcept(std::is_nothrow_swappable_v<Container> && std::is_nothrow_swappable_v<Compare>) {
+        lhs.swap(rhs);
+    }
+    /**
      * @brief Reserve capacity for underlying container
      * 
      * @param cap capacity to be reserved
@@ -401,14 +410,3 @@ private:
 };
 
 }; // namespace dsa
-
-/**
- * @brief IntervalHeap specialization for std::swap
- * 
- * @param lhs first heap to be swapped
- * @param rhs second heap to be swapped
- */
-template<class T, class Container, class Compare>
-constexpr void swap(dsa::IntervalHeap<T, Container, Compare>& lhs, dsa::IntervalHeap<T, Container, Compare>& rhs) noexcept(noexcept(lhs.swap(rhs))) {
-    lhs.swap(rhs);
-}

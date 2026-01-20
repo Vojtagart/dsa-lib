@@ -158,6 +158,16 @@ void test_dummy() {
     for (size_t i = 0; i < 1'000; i++) {
         q.emplace(uni(rng));
     }
+    using std::swap;
+    dsa::BinaryHeap<Dummy<double>> q2;
+    q2.emplace(10.);
+    swap(q, q2);
+    q.emplace(5);
+    dsa::BinaryHeap<Dummy<double>> q3(std::move(q));
+    dsa::BinaryHeap<Dummy<double>> q4;
+    q4 = std::move(q2);
+    q.reserve(100);
+    q.swap(q2);
 }
 
 void test_heapify() {
