@@ -133,10 +133,6 @@ public:
     constexpr void pop_min() {
         assert(!empty());
         size_t n = _data.size();
-        if (n == 1) {
-            _data.pop_back();
-            return;
-        }
         size_t idx = ROOT;
         if (n % 2) {
             _data[idx] = std::move(_data[n - 1]);
@@ -145,6 +141,7 @@ public:
             _data[n - 2] = std::move(_data[n - 1]);
         }
         _data.pop_back();
+        balance_node_check(idx);
         bubble_down_min(idx);
     }
     /**
@@ -160,8 +157,10 @@ public:
         size_t idx = ROOT + 1;
         _data[idx] = std::move(_data[n - 1]);
         _data.pop_back();
-        if (n > 2)
+        if (n > 2) {
+            balance_node(ROOT);
             bubble_down_max(idx);
+        }
     }
     /**
      * @brief Replace minimal value with given value, O(log(n))
@@ -231,8 +230,9 @@ public:
      * @param other IntervalHeap to switch content with
      */
     constexpr void swap(IntervalHeap& other) noexcept(std::is_nothrow_swappable_v<Container> && std::is_nothrow_swappable_v<Compare>) {
-        std::swap(_data, other._data);
-        std::swap(_comp, other._comp);
+        using std::swap;
+        swap(_data, other._data);
+        swap(_comp, other._comp);
     }
     /**
      * @brief Swap content of two IntervalHeaps
@@ -253,7 +253,7 @@ public:
     }
 private:
     static constexpr const size_t ROOT = 0;
-    Compare _comp;
+    [[no_unique_address]] Compare _comp;
     Container _data;
 
     static constexpr size_t get_parent(size_t idx) noexcept {
@@ -313,9 +313,10 @@ private:
      * @param idx index of element to bubble down
      */
     constexpr void bubble_down_min(size_t idx) {
-        assert(_data.size() > idx);
+        assert(_data.size() > idx || idx == 0);
         assert(is_min(idx));
         assert(idx >= ROOT);
+        using std::swap;
         size_t child = get_left(idx);
         size_t n = _data.size();
         while (child < n) {
@@ -325,10 +326,10 @@ private:
                 child += 2;
             // if child is smaller, swap and continue
             if (_comp(_data[child], _data[idx])) {
-                std::swap(_data[idx], _data[child]);
+                swap(_data[idx], _data[child]);
                 // if node interval property is not satisfied, swap them
                 if (child + 1 < n && _comp(_data[child + 1], _data[child]))
-                    std::swap(_data[child + 1], _data[child]);
+                    swap(_data[child + 1], _data[child]);
                 idx = child;
                 child = get_left(idx);
             } else {
@@ -347,7 +348,8 @@ private:
     constexpr void bubble_down_max(size_t idx) {
         assert(is_max(idx));
         assert(idx >= ROOT);
-        assert(_data.size() > idx);
+        assert(_data.size() > idx || idx == 0);
+        using std::swap;
         idx--;
         size_t child = get_left(idx);
         size_t n = _data.size();
@@ -365,11 +367,11 @@ private:
             // keep in mind that children denotes node the child is in,
             // while child1 denotes the actuall position (min or max)
             if (_comp(_data[idx + 1], _data[child1])) {
-                std::swap(_data[idx + 1], _data[child1]);
+                swap(_data[idx + 1], _data[child1]);
                 // if node interval property is not satisfied, swap them
                 // if max child was in max spot (not min) and is smaller than its min brother...
                 if (is_max(child1) && _comp(_data[child1], _data[child1 - 1]))
-                    std::swap(_data[child1], _data[child1 - 1]);
+                    swap(_data[child1], _data[child1 - 1]);
                 idx = child;
                 child = get_left(idx);
             } else {
@@ -379,15 +381,16 @@ private:
         // check interval property again
         // need to also check the the right side of interval exists
         if (idx + 1 < n && _comp(_data[idx + 1], _data[idx]))
-            std::swap(_data[idx], _data[idx + 1]);
+            swap(_data[idx], _data[idx + 1]);
     }
     /**
      * @brief Creates valid heap structure from _data, O(n)
      */
     constexpr void heapify() {
+        using std::swap;
         if (_data.size() <= 2) {
             if (_data.size() == 2 && _comp(_data[1], _data[0]))
-                std::swap(_data[1], _data[0]);
+                swap(_data[1], _data[0]);
             return;
         }
         for (size_t i = 0; i < _data.size() - 1; i += 2) {
@@ -400,8 +403,9 @@ private:
         }
     }
     constexpr void balance_node(size_t idx) {
+        using std::swap;
         if (_comp(_data[idx + 1], _data[idx]))
-            std::swap(_data[idx + 1], _data[idx]);
+            swap(_data[idx + 1], _data[idx]);
     }
     constexpr void balance_node_check(size_t idx) {
         if (idx + 1 < _data.size())

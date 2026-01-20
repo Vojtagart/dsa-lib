@@ -141,7 +141,8 @@ public:
         assert(!empty());
 
         // Older version
-        // std::swap(_data[ROOT], _data.back());
+        // using std::swap;
+        // swap(_data[ROOT], _data.back());
         // _data.pop_back();
         // bubble_down(ROOT);
     
@@ -200,8 +201,9 @@ public:
      * @param other BinaryHeap to switch content with
      */
     constexpr void swap(BinaryHeap& other) noexcept(std::is_nothrow_swappable_v<Container> && std::is_nothrow_swappable_v<Compare>) {
-        std::swap(_data, other._data);
-        std::swap(_comp, other._comp);
+        using std::swap;
+        swap(_data, other._data);
+        swap(_comp, other._comp);
     }
     /**
      * @brief Swap content of two BinaryHeaps
@@ -222,7 +224,7 @@ public:
     }
 private:
     static constexpr const size_t ROOT = 0;
-    Compare _comp;
+    [[no_unique_address]] Compare _comp;
     Container _data;
     
     static constexpr size_t get_parent(size_t idx) noexcept {
